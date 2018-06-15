@@ -1,0 +1,23 @@
+# this is a comment
+
+IncludeFiles FOLDER//*
+
+SelectFiles *.ext
+EditExtension
+SetEditedText .txt
+
+PrintChanges
+
+SelectFiles FOLDER/file*.txt
+EditName
+InsertPrefix the_
+InsertSuffix _renamed
+InsertText _was -8
+ReplaceExpression the_(.+?)_was_renamed The_renamed_$1
+InsertText <year><month:2><day:2>_<hour:2>_<minute:2>_<second:2>_ 0
+InsertText "<:these|characters/were\replaced !>" -0
+ReplaceCharacters ":|/\<> " _
+SetEditedText Now_it_is_<name>
+
+ConfirmChanges
+ApplyChanges

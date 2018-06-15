@@ -1,0 +1,75 @@
+# this is a comment
+
+IncludeFiles FOLDER//*
+
+Print "Included files :"
+PrintFiles "    \"<folder><name><extension>\""
+
+SelectFiles *.ext
+EditName
+InsertSuffix _0
+EditExtension
+SetEditedText .txt
+
+PrintChanges
+
+SelectFiles FOLDER/file*.txt
+EditName
+InsertPrefix the_
+InsertSuffix _renamed
+InsertText _was -8
+
+PrintChanges
+
+SelectFiles *
+EditNameExtension
+EditRange -3 -0
+SetCamelCase
+
+PrintChanges
+
+EditName
+FindText renamed
+SelectFoundFiles
+EditRange [0 ]0
+SetUpperCase
+
+PrintChanges
+
+SelectFiles *
+EditName
+FindExpression ^t[a-z][a-z]
+SelectFoundFiles
+ReplaceRange [0 ]0 THE
+
+PrintChanges
+
+SelectFiles *
+EditName
+ReplaceExpressionOnce (su.+?le)_ This_$1_is_
+
+PrintChanges
+
+SelectFiles THE_file_*
+EditName
+InsertText <year><month:2><day:2>_<hour:2>_<minute:2>_<second:2>_ 0
+
+PrintChanges
+
+SelectFiles This_sub_file_*
+EditName
+InsertText _<current_year><current_month:2><current_day:2>_<current_hour:2>_<current_minute:2>_<current_second:2> -0
+
+PrintChanges
+
+SelectFiles *sub*
+EditName
+InsertText "<:these|characters/were\replaced !>" -0
+PrintChanges
+ReplaceCharacters ":|/\<> " _
+SetEditedText Now_it_is_<name>
+
+PrintChangedFiles "The file <old_name> will be renamed to <name>..."
+
+ConfirmChanges
+ApplyChanges

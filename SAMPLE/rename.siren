@@ -1,0 +1,20 @@
+IncludeFiles *
+
+IgnoreFiles rename.*
+EditName
+
+SetCamelCase
+ReplaceText " " _
+ReplaceCharacters "<>:'\"\\|?*=&" -
+
+SelectFiles *.pdf
+AppendFiles *.png
+AppendFiles *.jpg
+AppendFiles *.txt
+IgnoreMatchingFiles ^\d\d\d\d_\d\d_\d\d_.*$
+EditName
+
+InsertText <year>_<month:2>_<day:2>_ 0
+
+ConfirmChanges
+ApplyChanges
