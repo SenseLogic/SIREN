@@ -1895,7 +1895,7 @@ class SCRIPT
         )
     {
         bool
-            it_is_in_string;
+            character_is_in_string;
         char
             character;
         long
@@ -1903,7 +1903,7 @@ class SCRIPT
         string[]
             argument_array;
 
-        it_is_in_string = false;
+        character_is_in_string = false;
 
         argument_array ~= "";
 
@@ -1913,7 +1913,7 @@ class SCRIPT
         {
             character = line[ character_index ];
 
-            if ( it_is_in_string )
+            if ( character_is_in_string )
             {
                 if ( character == '\\'
                      && character_index + 1 < line.length
@@ -1925,7 +1925,7 @@ class SCRIPT
                 }
                 else if ( character == '\"' )
                 {
-                    it_is_in_string = false;
+                    character_is_in_string = false;
                 }
                 else
                 {
@@ -1934,7 +1934,7 @@ class SCRIPT
             }
             else if ( character == '\"' )
             {
-                it_is_in_string = true;
+                character_is_in_string = true;
             }
             else if ( character == ' ' )
             {
