@@ -890,15 +890,16 @@ class SCRIPT
             dirEntries( folder_path, it_is_recursive ? SpanMode.depth : SpanMode.shallow )
             )
         {
-            if ( folder_entry.isFile()
-                 && !folder_entry.isSymlink() )
+            if ( folder_entry.isFile
+                 && !folder_entry.isSymlink )
             {
-                file_path = folder_entry;
+                file_path = folder_entry.name;
 
                 if ( file_path.MatchesFilter( file_path_filter )
                      && ( file_path in FileMap ) is null )
                 {
-                    getTimes( file_path, file_access_time, file_modification_time );
+                    file_access_time = folder_entry.timeLastAccessed;
+                    file_modification_time = folder_entry.timeLastModified;
 
                     FileMap[ file_path ] = new FILE( file_path, file_modification_time );
                 }
