@@ -90,7 +90,9 @@ siren [options]
 --set_minor_case
 --set_major_case
 --set_camel_case
+--set_pascal_case
 --set_snake_case
+--set_title_case
 --set_text new text
 --remove
 --remove_range first_position post_position
@@ -147,7 +149,9 @@ SetUpperCase
 SetMinorCase
 SetMajorCase
 SetCamelCase
+SetPascalCase
 SetSnakeCase
+SetTitleCase
 SetEditedText format
 SetFoundText format
 Remove

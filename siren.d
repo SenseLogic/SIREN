@@ -22,14 +22,14 @@
 
 import core.stdc.stdlib : exit;
 import std.algorithm : sort;
-import std.ascii : toUpper;
 import std.conv : to;
 import std.datetime : Clock, SysTime;
 import std.file : dirEntries, exists, getTimes, mkdirRecurse, readText, rename, FileException, SpanMode;
 import std.path : globMatch;
 import std.regex : regex, matchFirst, replaceAll, replaceFirst, Captures, Regex;
 import std.stdio : readln, writeln;
-import std.string : endsWith, indexOf, lastIndexOf, replace, split, startsWith, strip, toLower, toUpper;
+import std.string : endsWith, indexOf, join, lastIndexOf, replace, split, startsWith, strip;
+import std.uni : isLower, isUpper, toLower, toUpper;
 
 // -- TYPES
 
@@ -893,7 +893,7 @@ class SCRIPT
             if ( folder_entry.isFile
                  && !folder_entry.isSymlink )
             {
-                file_path = folder_entry.name;
+                file_path = folder_entry.name.GetLogicalPath();
 
                 if ( file_path.MatchesFilter( file_path_filter )
                      && ( file_path in FileMap ) is null )
@@ -1579,6 +1579,20 @@ class SCRIPT
 
     // ~~
 
+    void SetPascalCase(
+        )
+    {
+        foreach ( file; FileMap )
+        {
+            if ( file.IsSelected )
+            {
+                file.SetEditedText( file.GetEditedText().GetPascalCaseText() );
+            }
+        }
+    }
+
+    // ~~
+
     void SetSnakeCase(
         )
     {
@@ -1587,6 +1601,20 @@ class SCRIPT
             if ( file.IsSelected )
             {
                 file.SetEditedText( file.GetEditedText().GetSnakeCaseText() );
+            }
+        }
+    }
+
+    // ~~
+
+    void SetTitleCase(
+        )
+    {
+        foreach ( file; FileMap )
+        {
+            if ( file.IsSelected )
+            {
+                file.SetEditedText( file.GetEditedText().GetTitleCaseText() );
             }
         }
     }
@@ -2168,10 +2196,20 @@ class SCRIPT
                 {
                     SetCamelCase();
                 }
+                else if ( command == "SetPascalCase"
+                          && argument_array.length == 0 )
+                {
+                    SetPascalCase();
+                }
                 else if ( command == "SetSnakeCase"
                           && argument_array.length == 0 )
                 {
                     SetSnakeCase();
+                }
+                else if ( command == "SetTitleCase"
+                          && argument_array.length == 0 )
+                {
+                    SetTitleCase();
                 }
                 else if ( command == "SetEditedText"
                           && argument_array.length == 1 )
@@ -2501,6 +2539,14 @@ class SCRIPT
             {
                 SetCamelCase();
             }
+            else if ( option == "--set_pascal_case" )
+            {
+                SetPascalCase();
+            }
+            else if ( option == "--set_title_case" )
+            {
+                SetTitleCase();
+            }
             else if ( option == "--set_snake_case" )
             {
                 SetSnakeCase();
@@ -2664,22 +2710,7 @@ bool IsLowerCaseLetter(
     dchar character
     )
 {
-    return
-        ( character >= 'a' && character <= 'z' )
-        || character == 'à'
-        || character == 'â'
-        || character == 'é'
-        || character == 'è'
-        || character == 'ê'
-        || character == 'ë'
-        || character == 'î'
-        || character == 'ï'
-        || character == 'ô'
-        || character == 'ö'
-        || character == 'û'
-        || character == 'ü'
-        || character == 'ç'
-        || character == 'ñ';
+    return character.isLower();
 }
 
 // ~~
@@ -2688,21 +2719,7 @@ bool IsUpperCaseLetter(
     dchar character
     )
 {
-    return
-        ( character >= 'A' && character <= 'Z' )
-        || character == 'À'
-        || character == 'Â'
-        || character == 'É'
-        || character == 'È'
-        || character == 'Ê'
-        || character == 'Ë'
-        || character == 'Î'
-        || character == 'Ï'
-        || character == 'Ô'
-        || character == 'Ö'
-        || character == 'Û'
-        || character == 'Ü'
-        || character == 'Ñ';
+    return character.isUpper();
 }
 
 // ~~
@@ -2753,42 +2770,7 @@ dchar GetLowerCaseCharacter(
             case 'Ü' : return 'ü';
             case 'Ñ' : return 'ñ';
 
-            default : return character;
-        }
-    }
-}
-
-
-// ~~
-
-dchar GetUpperCaseCharacter(
-    dchar character
-    )
-{
-    if ( character >= 'a' && character <= 'z' )
-    {
-        return 'A' + ( character - 'a' );
-    }
-    else
-    {
-        switch ( character )
-        {
-            case 'à' : return 'À';
-            case 'â' : return 'Â';
-            case 'é' : return 'É';
-            case 'è' : return 'È';
-            case 'ê' : return 'Ê';
-            case 'ë' : return 'Ë';
-            case 'î' : return 'Î';
-            case 'ï' : return 'Ï';
-            case 'ô' : return 'Ô';
-            case 'ö' : return 'Ö';
-            case 'û' : return 'Û';
-            case 'ü' : return 'Ü';
-            case 'ç' : return 'C';
-            case 'ñ' : return 'Ñ';
-
-            default : return character;
+            default : return character.toLower();
         }
     }
 }
@@ -2799,15 +2781,7 @@ string GetLowerCaseText(
     string text
     )
 {
-    string
-        lower_case_text;
-
-    foreach ( dchar character; text )
-    {
-        lower_case_text ~= GetLowerCaseCharacter( character );
-    }
-
-    return lower_case_text;
+    return text.toLower();
 }
 
 // ~~
@@ -2816,15 +2790,23 @@ string GetUpperCaseText(
     string text
     )
 {
-    string
-        upper_case_text;
+    return text.toUpper();
+}
 
-    foreach ( dchar character; text )
+// ~~
+
+dstring GetMinorCaseText(
+    dstring text
+    )
+{
+    if ( text.length >= 2 )
     {
-        upper_case_text ~= GetUpperCaseCharacter( character );
+        return text[ 0 .. 1 ].toLower() ~ text[ 1 .. $ ];
     }
-
-    return upper_case_text;
+    else
+    {
+        return text.toLower();
+    }
 }
 
 // ~~
@@ -2833,13 +2815,22 @@ string GetMinorCaseText(
     string text
     )
 {
+    return text.to!dstring().GetMinorCaseText().to!string();
+}
+
+// ~~
+
+dstring GetMajorCaseText(
+    dstring text
+    )
+{
     if ( text.length >= 2 )
     {
-        return text[ 0 .. 1 ].GetLowerCaseText() ~ text[ 1 .. $ ];
+        return text[ 0 .. 1 ].toUpper() ~ text[ 1 .. $ ];
     }
     else
     {
-        return text.GetLowerCaseText();
+        return text.toUpper();
     }
 }
 
@@ -2849,14 +2840,7 @@ string GetMajorCaseText(
     string text
     )
 {
-    if ( text.length >= 2 )
-    {
-        return text[ 0 .. 1 ].GetUpperCaseText() ~ text[ 1 .. $ ];
-    }
-    else
-    {
-        return text.GetUpperCaseText();
-    }
+    return text.to!dstring().GetMajorCaseText().to!string();
 }
 
 // ~~
@@ -2879,7 +2863,7 @@ string GetCamelCaseText(
         if ( character.IsLowerCaseLetter()
              && !prior_character.IsLetter() )
         {
-            camel_case_text ~= character.GetUpperCaseCharacter();
+            camel_case_text ~= character.toUpper();
         }
         else
         {
@@ -2890,6 +2874,15 @@ string GetCamelCaseText(
     }
 
     return camel_case_text;
+}
+
+// ~~
+
+string GetPascalCaseText(
+    string text
+    )
+{
+    return text.GetCamelCaseText().GetMajorCaseText();
 }
 
 // ~~
@@ -2924,6 +2917,25 @@ string GetSnakeCaseText(
     }
 
     return snake_case_text;
+}
+
+// ~~
+
+string GetTitleCaseText(
+    string text
+    )
+{
+    string[]
+        word_array;
+
+    word_array = text.GetSnakeCaseText().GetLowerCaseText().split( '_' );
+
+    foreach ( ref word; word_array )
+    {
+        word = word.GetMajorCaseText();
+    }
+
+    return word_array.join( ' ' );
 }
 
 // ~~
@@ -2986,6 +2998,15 @@ string ReplaceCharacters(
     }
 
     return replaced_text;
+}
+
+// ~~
+
+string GetLogicalPath(
+    string path
+    )
+{
+    return path.replace( '\\', '/' );
 }
 
 // ~~
@@ -3209,7 +3230,9 @@ void main(
         writeln( "    SetMinorCase" );
         writeln( "    SetMajorCase" );
         writeln( "    SetCamelCase" );
+        writeln( "    SetPascalCase" );
         writeln( "    SetSnakeCase" );
+        writeln( "    SetTitleCase" );
         writeln( "    SetEditedText format" );
         writeln( "    SetFoundText format" );
         writeln( "    Remove" );
